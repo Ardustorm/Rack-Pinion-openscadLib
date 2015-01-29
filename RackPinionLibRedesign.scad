@@ -27,20 +27,14 @@ $fn=50;
 // use <rack_and_pinion.scad>
 // then:
 // a simple rack
-/*difference(){
-	union(){
-		rack(10,12,10,15);//CP (mm/tooth), width (mm), thickness(of base) (mm), # teeth
-		translate([0,0,10])rotate([0,90,0]) cylinder(r=2,h=122,center=true);
-		}
-		translate([0,0,0])rotate([0,90,0]) cylinder(r=2,h=125,center=true);
-	}
-*/
- //a simple pinion and translation / rotation to make it mesh the rack
-// translate([0,-36,0])rotate([0,0,360/10/2]) pinion(10,15,10,5);
 
-		rack(10,14,10,15,6);//CP (mm/tooth), width (mm), thickness(of base) (mm), # teeth, lip
+//		rack(10,14,10,15,6);//CP (mm/tooth), width (mm), thickness(of base) (mm), # teeth, lip
+difference(){
+cube([20,20,16], center=true);
+translate([0,-1,1]) rotate([0,0,0])rackCutout(40,14,10,6,.5);
+}
 
-translate([0,-46,0])rotate([0,0,360/10/2]) pinion(10,15,10,19);// cp= circular pitch, # of teeth, width, shaft Diameter
+//translate([0,-46,0])rotate([0,0,360/10/2]) pinion(10,15,10,19);// cp= circular pitch, # of teeth, width, shaft Diameter
 
 
 module rack(cp, N, width, thickness, lip=0){
@@ -86,6 +80,24 @@ lip =lip/2;
 			}
 		}
 	}
+
+module rackCutout(length, thickness, width, lip=0, clearance){
+// cp = circular pitch - for rack = pitch in mm/per tooth
+// N = number of teeth
+// width = width of rack
+// thickness = thickness of support under teeth (0 for no support)
+// lip = how thick of a radius the goove and nub are
+	lip =(lip+clearance)/2;
+
+	union(){
+		difference(){
+			cube(size=[length,width+clearance,thickness+clearance],center=true);
+			translate([0,-width/2,0])rotate([0,90,0])cylinder(r=lip,h=length+abit,center=true);
+			}
+		translate([0,width/2,0])rotate([0,90,0])cylinder(r=lip,h=length,center=true);
+	}
+}
+
 
 module pinion (cp, N, width, shaft_diameter, backlash=0){
 // cp= circular pitch - for pinion pitch in mm/per as measured along the ptich radius (~1/2 way up tooth)
